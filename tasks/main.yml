@@ -26,6 +26,9 @@
 - name: Set the kernel paramter for vm overcommit 
   sysctl: name=vm.overcommit_memory value=1 state=present
 
-- name: start the redis service
-  service: name={{ redis_service }} state=started enabled=yes
+- name: make init script for redis instance
+  template: src=redis.init.j2 dest=/etc/init.d/redis_{{ redis_port }} mode=755
+
+- name: start the redis service redis_{{ redis_port }}
+  service: name=redis_{{ redis_port }} state=started enabled=yes
 
