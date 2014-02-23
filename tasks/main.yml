@@ -5,7 +5,7 @@
 
 - name: Install the epel packages 
   yum: name=http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm state=present
-  when: ansible_os_family == "RedHat"
+  when: ansible_os_family == "RedHat" and manage_epel == true
 
 - name: Install the Redis packages 
   yum: name={{ item }} state=present
@@ -18,17 +18,26 @@
   environment: env
   when: ansible_os_family == "Debian"
 
+- name: Create redis conf directory
+  file: path=/etc/redis state=directory owner=root group=root mode=755
+
+- name: Create redis data directory
+  file: path={{ redis_db_dir }} state=directory mode=755 owner=root group=root
+
 - name: Copy the redis configuration file 
   template: src=redis.conf.j2 dest={{ redis_conf_dest }}
   notify: 
-   - restart redis 
+   - restart redis_{{ redis_port }}
 
 - name: Set the kernel paramter for vm overcommit 
   sysctl: name=vm.overcommit_memory value=1 state=present
+  when: vm_overcommit_memory == true
 
 - name: make init script for redis instance
   template: src=redis.init.j2 dest=/etc/init.d/redis_{{ redis_port }} mode=755
+  when: ansible_os_family == "RedHat"
+
+#TODO: Implement init script for debian based systems.
 
 - name: start the redis service redis_{{ redis_port }}
   service: name=redis_{{ redis_port }} state=started enabled=yes
-

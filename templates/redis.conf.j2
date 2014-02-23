@@ -213,7 +213,9 @@ dir {{ redis_db_dir }}
 {% if redis_role == 'slave' %}
 slaveof {{ redis_master_ip }} {{ redis_master_port }}
 
+{% if redis_master_auth: %}
 masterauth {{ redis_master_auth }}
+{% endif %}
 {% endif %}
 
 # When a slave loses its connection with the master, or when the replication
@@ -386,7 +388,9 @@ requirepass {{ redis_pass }}
 # Once the limit is reached Redis will close all the new connections sending
 # an error 'max number of clients reached'.
 #
+{% if redis_max_clients: %}
 maxclients {{ redis_max_clients }}
+{% endif %}
 
 # Don't use more memory than the specified amount of bytes.
 # When the memory limit is reached Redis will try to remove keys

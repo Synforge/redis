@@ -1,5 +1,7 @@
 ---
 
+manage_epel: False
+
 redis_pidfile: /var/run/redis.pid
 redis_bind_address: "0.0.0.0"
 redis_unixsocket: null
